@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+	<html>
+	<head>
+		<title></title>
+	</head>
+	<body>
+		<div style="width:80%;">
+			<input id = 'text-box' class = 'f-input id-number-value'/>
+			<textarea id =  "text-area" class = 'f-input id-number-value'></textarea>
+			<div id ="div" class = "id-number-value">
+				9102291231234
+			</div>
+		</div>
+		<script src = "../src/sa-id-validae.js"></script>
+		<script>
+			console.log( new SaIdValidae(".id-number-value").validate() );
+		</script>
+	</body>
+</html>

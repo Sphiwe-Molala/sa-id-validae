@@ -1,0 +1,24 @@
+{
+  "name": "sa-id-validae",
+  "authors": [
+    "Sphiwe Molala <molalasphiwe@gmail.com>"
+  ],
+  "description": "Validate the south african id number",
+  "main": "sa-id-validify.js",
+  "keywords": [
+    "South",
+    "Africa",
+    "ID",
+    "Number"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
