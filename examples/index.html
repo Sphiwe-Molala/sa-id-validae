@@ -3,17 +3,132 @@
 	<head>
 		<title></title>
 	</head>
+	<style type="text/css">
+		body{
+			font-family: arial;
+			background-color: rgba(0,160,200,0.1);
+		}
+		header{
+			margin: -50px  -20%  0 -20%;
+			min-height: 200px;
+			background-color: rgb(0,100,200);
+			color:#ddd;
+		}
+		h1, h4, h5{
+			text-align: center;
+		}
+		label{
+			margin-bottom: 5px;
+		}
+		#container{
+			box-shadow: 2px  2px 8px rgba(0,160,200,0.5), 2px  2px 8px rgba(0,110,200,0.2);
+			padding:20px;
+			width:80%;
+			margin:auto;
+			background-color: #fff;
+		}
+		.f-input {
+			display: block;
+			width:100%;
+			font-size: 20px;
+		}
+
+		.f-input-wrapper{
+			border:1px solid rgba(0,60,200,0.5);
+			border-radius:5px;
+			padding:5px;
+		}
+		.f-input-wrapper * {
+			border:none;
+			min-height: 30px;
+			outline:0;
+		}
+		.group{
+			margin-bottom: 10px;
+		}
+		.feed-back {
+			padding:5px;
+			background-color: rgb(0,0,0);
+			color:#fff;
+		}
+		button{
+			padding:20px;
+			text-align: center;
+			color:#fff;
+			background-color: rgb(0,160,200);
+			border: 1px solid rgb(0,110,200);
+			font-size: 20px;
+			border-radius: 5px;
+			margin-left:calc(50% - 113px);
+			cursor: pointer;
+		}
+
+		.object-properties{
+			color:rgb(0,100,200);
+		}
+	</style>
 	<body>
-		<div style="width:80%;">
-			<input id = 'text-box' class = 'f-input id-number-value'/>
-			<textarea id =  "text-area" class = 'f-input id-number-value'></textarea>
-			<div id ="div" class = "id-number-value">
-				9102291231234
+		<div id = "container" >
+
+			<header>
+				<h1>SA-ID-VALIDAE</h1>
+				<h4>Validate south african id numbers with ease</h4>
+				<h5>xxxxxx xxxx xxx</h5>
+			</header>
+			<div>
+				<h3 style="color:red;">Note: These examples show the object returned on validation</h3>
 			</div>
+			<div class = "group">
+				<label>Textbox</label>
+				<div class = 'f-input-wrapper'>
+					<input id = 'text-box' class = 'f-input id-number-value'/>
+				</div>
+				<div class = "feed-back">
+				</div>
+			</div>
+
+			<div class = "group">
+				<label>Textarea</label>
+				<div class = 'f-input-wrapper'>
+					<textarea id =  "text-area" class = 'f-input id-number-value'></textarea>
+				</div>
+				<div class = "feed-back">
+				</div>
+			</div>
+			<div class = "group">
+				<label>Div</label>
+				<div class = 'f-input-wrapper'>
+					<div id ="div" class = "id-number-value">
+						9102291231234------))*
+					</div>
+				</div>
+				<div class = "feed-back">
+				</div>
+			</div>
+			<button>Validate</button>
 		</div>
 		<script src = "../src/sa-id-validae.js"></script>
 		<script>
-			console.log( new SaIdValidae(".id-number-value").validate() );
+			
+			function wrap( charct , _class ){
+				return "<span class = '" + _class +"'>" +  charct + "</span>"
+			}
+
+			function validate(){
+				var obj = new SaIdValidae(".id-number-value" , "[ 40 - 42 ] : [ 45 ]");
+				var feedbacks = document.getElementsByClassName("feed-back");
+
+				var results = obj.validate();
+				for ( subscript in results ) {
+					if ( feedbacks[ subscript ] ){
+						feedbacks[ subscript ].innerHTML = SaIdValidae.toHTMLString( results[ subscript ] ).replace(/{/g,wrap("{","object-properties")).replace(/}/g,wrap("}","object-properties")).replace(/:/g,wrap(":","object-properties")).replace(/\[/g,wrap("[","object-properties")).replace(/\]/g,wrap("]","object-properties")).replace(/(=>)/g,wrap("=>","object-properties"));
+					}
+				}
+
+			}
+
+			validate();
+			document.getElementsByTagName("button")[0].onclick = validate;
 		</script>
 	</body>
 </html>
