@@ -99,7 +99,7 @@
 				<label>Div</label>
 				<div class = 'f-input-wrapper'>
 					<div id ="div" class = "id-number-value">
-						9102291231234------))*
+						0602291231234------))*
 					</div>
 				</div>
 				<div class = "feed-back">
@@ -108,6 +108,11 @@
 			<button>Validate</button>
 		</div>
 		<script src = "../src/sa-id-validae.js"></script>
+		<div>
+			<script>
+				//document.write( SaIdValidae.toHTMLString( new SaIdValidae("9408125394086").validate() ) );
+			</script>
+		</div>
 		<script>
 			
 			function wrap( charct , _class ){
@@ -118,6 +123,10 @@
 				var obj = new SaIdValidae(".id-number-value" , "[ 40 - 42 ] : [ 45 ]");
 				var feedbacks = document.getElementsByClassName("feed-back");
 
+				obj.settings.year = 2016;
+				obj.settings.dontForgetThese1900s = [];
+				obj.settings.forgetThe1900s = true;
+
 				var results = obj.validate();
 				for ( subscript in results ) {
 					if ( feedbacks[ subscript ] ){
@@ -126,7 +135,10 @@
 				}
 
 			}
-
+			//auto tuning
+			//manual
+			//program cetalite
+			//
 			validate();
 			document.getElementsByTagName("button")[0].onclick = validate;
 		</script>

@@ -186,7 +186,7 @@ if ( !document.getElementsByClassName ){
 		}
 		this.createLocalSettings = function() {
 
-			this.settings = this.copyFrom( this.w.SaIdValidae.settings );
+			this.settings = this.copyFrom( this.w.SaIdValidaeSettings );
 
 		}
 
@@ -308,13 +308,14 @@ if ( !document.getElementsByClassName ){
 
 			for( var i = 0; i < this.idNumberObjects.length; ++i ) {
 
-				var idNumber = this.idNumberObjects[i].value, valid = false, messages = [], gender = null,citizen=null;
+				var idNumber = this.idNumberObjects[i].value, valid = false, messages = [], gender = null, citizen=null;
+				var y = null,yyyy = null, m = null, d = null, g = null, c = null, the8 = null;
 				if ( this.settings.ignoreWhiteSpace ){
 					idNumber = idNumber.replace(/\s*/g,"");
 				}
 				
 				idNumber = this.removeIgnoreChars( idNumber );
-				
+
 
 				if ( idNumber.length != 13 )
 
@@ -326,7 +327,7 @@ if ( !document.getElementsByClassName ){
 
 				} else{
 
-					var y = idNumber.substring(0,2), m = idNumber.substring(2,4), d = idNumber.substring(4,6), g = idNumber.substring(6,7), c = idNumber.substring(10,11), the8 = idNumber.substring(11,12);
+					y = idNumber.substring(0,2), m = idNumber.substring(2,4), d = idNumber.substring(4,6), g = idNumber.substring(6,7), c = idNumber.substring(10,11), the8 = idNumber.substring(11,12);
 
 					if ( g < 5 )
 
@@ -337,11 +338,11 @@ if ( !document.getElementsByClassName ){
 						gender = "m";					
 
 
-					if (  c == 1 )
+					if (  c == 0 )
 
 						citizen = "SA Citizen";
 
-					else if ( c == 0 )
+					else if ( c == 1 )
 
 						citizen = "Non-SA Citizen";
 
@@ -351,21 +352,59 @@ if ( !document.getElementsByClassName ){
 
 					}
 
-					var the8IsOk = false;
+					var isSecondLastDigitIsOk = false;
 					for ( var z = 0; z < this.settings.secondLastDigitAcceptables.length; ++z ) {
 						
 						if ( this.settings.secondLastDigitAcceptables[z] == the8 ){
 
-							the8IsOk = true;
+							isSecondLastDigitIsOk = true;
 							break;
 						
 						}	
 
 					}
 
-					if ( !the8IsOk ) {
+					if ( !isSecondLastDigitIsOk ) {
 
-						messages.push( this.settings.messages.invalid8 );
+						messages.push( this.settings.messages.invalidSecondLastDigit );
+
+					}
+
+
+					if ( this.settings.forgetThe1900s ) {
+
+						if ( !/^\d{4}$/.test( this.settings.year + "" ) ) {
+
+							this.logWarning( "Forgetting the 19s aborted due to invalid year value" );
+
+						} else {
+
+							var dontIgnore = false;
+
+							if ( this.settings.dontForgetThe1900sFor instanceof Array ) {
+
+								for ( var x = 0; x < this.settings.dontForgetThese1900s.length; ++x ) {
+
+									if ( this.settings.dontForgetThese1900sFor[x] == y )
+
+										dontIgnore = true;
+
+								}
+
+							}
+
+
+							if ( !dontIgnore ) {
+
+								if ( parseInt( ( this.settings.year + "" ).substring( 2, 4 ) ) >  parseInt( y ) ) {
+
+									yyyy = "20" + y;
+
+								}
+
+							}
+
+						}	
 
 					}
 
@@ -378,9 +417,13 @@ if ( !document.getElementsByClassName ){
 
 					if ( !( m > 12 || m == 0 ) ) {
 
-						if ( !(d > 31 || d == 0) ){
+						if ( !(d > 31 || d == 0) ) {
 
-							if ( !this.isDayInmonth( parseInt( d ), parseInt( m ) ) ) {//note tests for months ending on the 31st will always be true
+							if ( !yyyy )
+
+								yyyy = "19" + y;
+
+							if ( !this.isDayInmonth( parseInt( d ), parseInt( m ), y ) ) {//note tests for months ending on the 31st will always be true
 
 								messages.push( this.settings.messages.invalidDay );
 
@@ -391,30 +434,72 @@ if ( !document.getElementsByClassName ){
 					} else {
 
 						messages.push( this.settings.messages.invalidMonth );
+					
 					}
+
+					// if ( this.settings.noFutureIds ) {
+
+					// 	if ( /^\d{4}$/.test( this.settings.year + "" ) ) {
+
+							
+
+					// 	} else {
+
+					// 		this.logWarning( "Future ID numbers rejection aborted due to invalid year value in settings" );
+					// 		this.settings.noFutureIds = false;
+
+					// 	}
+
+					// }
 				}
 
 				if ( !messages.length )
 
 					valid = true;
 
-				results.push( { valid: valid , messages: messages, gender:gender, citizen:citizen } );
+				results.push( { valid: valid , messages: messages, gender:gender, citizen:citizen, elem:this.idNumberObjects[i].elem, dd:d, mm:m , yy:y, yyyy: yyyy, mmmm:this.getMonthWord( m ) } );
 			}
 
 			return results;
 
 		}
+		this.getMonthWord = function ( m ){
+			m = parseInt( m );
+			switch ( m ) {
+				case 1 : return "January";
+				case 2 : return "February";
+				case 3 : return "March";
+				case 4 : return "April";
+				case 5 : return "May";
+				case 6 : return "June";
+				case 7 : return "July";
+				case 8 : return "August";
+				case 9 : return "September";
+				case 10 : return "October";
+				case 11 : return "November";
+				case 12 : return "December";
+				default : return null;
+			}
 
-		this.isDayInmonth = function( day, month ) {
-			var lastDays = [ null , 31, 28, 31, 30, 31, 30, 31 ,31 ,30, 31, 30, 31];//indexes represent months numbers, 1 = January and so on
+		}
+		this.isDayInmonth = function( day, month, year ) {
+			var lastDays = [ null , 31, 28, 31, 30, 31, 30, 31 ,31 ,30, 31, 30, 31 ];//indexes represent months numbers, 1 = January and so on
 
-			if ( lastDays[ month ] < day ){
+			console.log( year );
+
+			if ( lastDays[ month ] < day ) {
 
 				if ( month == 2 ) {
 
 					if ( this.settings.considerLeapYear ) {
 
-						if ( /^\d{4}$/.test( this.settings.year + "" ) ) {
+						if ( year.length != 4 ) {
+
+							year = "19" + year;
+
+						}
+
+						if ( /^\d{4}$/.test( year + "" ) ) {
 
 							if ( this.settings.year%4 == 0 ) {
 
@@ -488,7 +573,7 @@ if ( !document.getElementsByClassName ){
 
 	}
 
-	w.SaIdValidae.settings = {
+	w.SaIdValidaeSettings = {
 		showCapturedErrors:true,
 		showCapturedWarnings:true,
 		ignoreWhiteSpace:true,
@@ -499,12 +584,13 @@ if ( !document.getElementsByClassName ){
 			invalidMonth:"Invalid Month",
 			invalidYear:"Invalid Year",
 			invalidCitizenNumber:"Invalid Citizen Number",
-			invalid8:"Invalid 8"
+			invalidSecondLastDigit:"Invalid second last digit"
 		},
 		considerLeapYear:false,
 		year:null,
-		ignoreByCharCode:false,
-		secondLastDigitAcceptables:[8,9]
+		secondLastDigitAcceptables:[8,9],
+		forgetThe1900s:false,
+		dontForgetThese1900s:[]
 	}
 
 	//lets store reference to the prototype object for easy access
@@ -568,9 +654,9 @@ if ( !document.getElementsByClassName ){
 
 		} else {
 
-				if ( (typeof obj==="object") && (obj.nodeType===1) && (typeof obj.style === "object") && (typeof obj.ownerDocument ==="object") )
+			if ( (typeof obj==="object") && (obj.nodeType===1) && (typeof obj.style === "object") && (typeof obj.ownerDocument ==="object") )
 
-					return "{" + object.toString() + "}";
+				return "{" + object.toString() + "}";
 
 		}
 
