@@ -126,7 +126,7 @@ if ( !document.getElementsByClassName ){
 
 				}
 
-				console.log( this.ignoreChars );
+				//console.log( this.ignoreChars );
 
 				if ( invalid ) {
 
@@ -485,7 +485,7 @@ if ( !document.getElementsByClassName ){
 		this.isDayInmonth = function( day, month, year ) {
 			var lastDays = [ null , 31, 28, 31, 30, 31, 30, 31 ,31 ,30, 31, 30, 31 ];//indexes represent months numbers, 1 = January and so on
 
-			console.log( year );
+			//console.log( year );
 
 			if ( lastDays[ month ] < day ) {
 
